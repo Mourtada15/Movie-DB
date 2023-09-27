@@ -116,8 +116,17 @@ app.use('/update', (req, res) => {
   res.status(200).send({status:200, message:"update"})
 })
 
-app.use('/delete', (req, res) => {
-  res.status(200).send({status:200, message:"delete"})
+app.use('/movies/delete/:ID', (req, res) => {
+  const { ID } = req.params;
+  const index = movies.findIndex((movie) => movie.id === ID);
+  
+  if (index !== -1) {
+    movies.splice(index, 1);
+
+    res.status(200).send({ status: 200, data: movies });
+  } else {
+    res.status(404).send({ status: 404, error: true, message: `The movie ${ID} does not exist`});
+  }
 })
 
 app.listen(port, () => {
