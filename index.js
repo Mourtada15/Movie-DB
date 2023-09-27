@@ -3,6 +3,7 @@ const app = express()
 const port = 3000
 
 app.set('case sensetive routing', false);
+let nextId = 5;
 
 const movies = [
   { id: '1', title: 'Jaws', year: 1975, rating: 8 },
@@ -47,9 +48,39 @@ app.get('/search', (req, res) => {
   
 })
 
-app.use('/create', (req, res) => {
-  res.status(200).send({status:200, message:"create"})
-})
+app.use('/movies/add', (req, res) => {
+  const { title, year, rating } = req.query;
+
+  if (!title || !year) {
+    return res.status(403).send({
+      status: 403,
+      error: true,
+      message:'You cannot create a movie without providing a title and a year',
+    });
+  }
+
+  if (!/^\d{4}$/.test(year)) {
+    return res.status(403).send({
+      status: 403,
+      error: true,
+      message: 'Not a number',
+    });
+  }
+
+  const newRating = rating ? parseFloat(rating) : 4;
+
+  const newMovie = {
+    id: nextId.toString(),
+    title,
+    year: parseInt(year),
+    rating: newRating,
+  };
+  nextId++;
+
+  movies.push(newMovie);
+
+  res.status(200).send({status: 200, data: movies });
+});
 
 app.get('/movies/read', (req, res) => {
   res.status(200).send({status:200, message: movies})
